@@ -1,0 +1,29 @@
+%%
+
+### Model 1
+y=[K^2*ADs]+[v]
+  [K^2*ADd]+[v]
+  
+###  Model 2
+y=[K^2*ADs]+[vs]
+  [K^2*ADd]+[vd]
+
+### Model 3
+y=D(A+v)+[vs]=DA+Dv+[vs]
+        +[vd]      +[vd]
+        
+### Model 4
+y'=[K^2*ADs]+[vs]
+   [K*ADd]  +[vd]
+
+y=[K^2*ADs]+[vs]
+  [K^2*ADd]+[Kvd]
+
+### Model 5
+y'=[ADs]+[vs]
+   [ADd]+[vd]
+
+y=[K^2*ADs]+[K^2*vs]
+  [K^2*ADd]+[K^2*vd]
+
+

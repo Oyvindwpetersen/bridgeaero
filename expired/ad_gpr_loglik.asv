@@ -1,0 +1,30 @@
+function [logL,logL_grad]=ad_gpr_loglik(test_matrix,y,d,sigma_v,sigma_a,L_a)
+
+%%
+
+[Ka,Ky,alpha,xt_uni,D_glob_grad]=ad_gpr(test_matrix,y,d,sigma_v,sigma_a,L_a);
+
+logL=loglik(y,Ky);
+
+
+logL_grad();
+
+
+
+
+for j=1:n_par
+
+    D_glob_grad_t{j}=D_glob_grad{j}*I2*Sa;
+end
+
+
+for j=1:n_par
+
+    if any(j==)
+        Ky_grad{j}=D_glob_grad_t{j}*Ka*D_glob_t+D_glob_t*Ka*D_glob_grad_t{j};
+    elseif any(j==)
+        Ky_grad{j}=2*sigma_v*eye(size(y));
+    elseif any(j==)
+        Ky_grad{j}=2*sigma_v*eye(size(y));
+
+end
