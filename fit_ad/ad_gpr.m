@@ -19,16 +19,6 @@ function [Ka,Ky,beta,xt_uni,St,D_glob,N,Ka_grad,D_glob_grad,N_grad,abar_grad]=ad
 % D_glob_grad:
 % N_grad:
 
-%%
-
-% na=model.na;
-
-% d=model.hyp.d;
-% sigma_v=model.hyp.sigma_v;
-% sigma=model.hyp.sigma;
-% L=model.hyp.L;
-% alpha_a=model.hyp.alpha;
-% abar=model.abar;
 
 %%
 
@@ -47,36 +37,6 @@ end
 % Kernel for a_restack
 % a_restack=[a1(x1) a1(x2) .... a1(xN) , a2(x1) a2(x2) ... a2(xN) , a3(x1) a3(x2) ... a3(xN)];
 
-
-% OLD
-% [Ka_blk,Ka_grad_tmp]=kernel_cov_old(xt_uni,xt_uni,model);
-% Ka=blkdiag2(Ka_blk{:},'sparse');
-% Ka=St*Ka*St.';
-% 
-% idx=0;
-% for n=1:length(Ka_grad_tmp{1})
-% 
-%     offset_col=0;
-%     offset_row=0;
-% 
-%     for k=1:model.na
-% 
-%         idx=idx+1;
-%         range_col=offset_col+[1:size(Ka_grad_tmp{k}{n},1)];
-%         range_row=offset_row+[1:size(Ka_grad_tmp{k}{n},1)];
-% 
-%         tmp=sparse(size(Ka,1),size(Ka,2));
-%         tmp(range_col,range_row)=Ka_grad_tmp{k}{n};
-% 
-%         Ka_grad_old{idx}=St*tmp*St.';
-% 
-%         offset_col=range_col(end);
-%         offset_row=range_row(end);
-% 
-%     end
-% end
-
-% NEW
 [Ka_blk,Ka_grad_tmp]=kernel_cov(xt_uni,xt_uni,model.kernel,model.hyp);
 Ka=blkdiag2(Ka_blk{:},'sparse');
 Ka=St*Ka*St.';
@@ -88,20 +48,10 @@ for n=1:size(Ka_grad_tmp,1)
 
         idx=idx+1;
         range=(k-1)*length(xt_uni)+[1:length(xt_uni)];
-        % 
-        % tmp=sparse(size(Ka,1),size(Ka,2));
-        % tmp(range,range)=Ka_grad_tmp{n,k};
-        % Ka_grad{idx}=St*tmp*St.';
-        % 
-        % 
-        % S1=[sparse((k-1)*length(xt_uni),length(xt_uni)) ; speye(length(xt_uni)) ; sparse((model.na-k)*length(xt_uni),length(xt_uni)) ];
-        % S=St*S1;
-        % Ka_grad{idx}=St*S1*sparse(Ka_grad_tmp{n,k})*S2*St.';
-        % Ka_grad{idx}=S*sparse(Ka_grad_tmp{n,k})*S.';
+        
+        S_tmp=St(:,range);
 
-        S_test=St(:,range);
-
-        Ka_grad{idx}=S_test*sparse(Ka_grad_tmp{n,k})*S_test.';
+        Ka_grad{idx}=S_tmp*sparse(Ka_grad_tmp{n,k})*S_tmp.';
     end
 end
 
