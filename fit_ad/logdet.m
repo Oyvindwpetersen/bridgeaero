@@ -45,7 +45,7 @@ if strcmpi(method,'det')
 end
 
 if strcmpi(method,'svd')
-    [u,s,v]=svd(A);
+    [s]=svd(A);
     log_det_A=sum(log(diag(s)));
 end
 
