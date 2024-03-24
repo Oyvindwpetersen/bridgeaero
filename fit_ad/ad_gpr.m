@@ -19,7 +19,6 @@ function [Ka,Ky,beta,xt_uni,St,D_glob,N,Ka_grad,D_glob_grad,N_grad,abar_grad]=ad
 % D_glob_grad:
 % N_grad:
 
-
 %%
 
 if size(test_matrix,1)~=length(y)/2
