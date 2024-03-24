@@ -3,7 +3,7 @@ function plotadsplitref(ha,K_ref,yr_ref,yi_ref,varargin)
 %% Plot separate
 %
 % Inputs:
-% ha: vect0r with handles to axes
+% ha: vector with handles to axes
 % K_ref: vector with frequencies
 % yr_ref: matrix with real part of transfer function (column for each x)
 % yi_ref: matrix with imaginary part of transfer function (column for each x)
