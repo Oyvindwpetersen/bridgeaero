@@ -3,11 +3,11 @@ function [log_det_A,L]=logdet(A,method)
 %% Logarithmic of matrix determinant
 %
 % For matrices that area large or close to singular, the det() function can give inaccurate results
-% The log of the determinant can be calculated using the singular value or cholesky decomposition 
-% The chol option requires a positive definite matrix
+% The log of the determinant can be calculated using the singular value decomposition or cholesky decomposition 
+% The chol method requires a positive definite matrix
 %
 % Inputs:
-% A: square matrix with inputs as columns
+% A: square matrix
 % method: 'det', 'svd', or 'chol'
 %
 % Outputs:
@@ -22,6 +22,7 @@ if n1~=n2
     error('Matrix must be square');
 end
 
+% If scalar, skip decomposition methods
 if isscalar(A)
     log_det_A=log(A);
     
@@ -45,7 +46,7 @@ if strcmpi(method,'det')
 end
 
 if strcmpi(method,'svd')
-    [s]=svd(A);
+    s=svd(A);
     log_det_A=sum(log(diag(s)));
 end
 
