@@ -72,7 +72,47 @@ plotopt2.linestyle='None';
 
 %%
 
+if ~iscell(plot_matrix)
+    plot_matrix={plot_matrix};
+end
+
+if ~iscell(f)
+    f={f};
+end
+
+if ~iscell(test_matrix)
+    test_matrix={test_matrix};
+end
+
+if ~iscell(f_point)
+    f_point={f_point};
+end
+
 [n1,n2]=size(f);
+
+for idx1=1:n1
+    for idx2=1:n2
+
+        if ~isnumeric(plot_matrix{idx1,idx2})
+            error('Must be a matrix');
+        end
+
+        if ~isnumeric(f{idx1,idx2})
+            error('Must be a matrix');
+        end
+
+        if ~isnumeric(test_matrix{idx1,idx2})
+            error('Must be a matrix');
+        end
+
+        if ~isnumeric(f_point{idx1,idx2})
+            error('Must be a matrix');
+        end
+
+    end
+end
+
+%%
 
 figure();
 ha=tight_subplot(n1,n2,gap,marg_h,marg_w);
@@ -84,7 +124,6 @@ for idx1=1:n1
         c=c+1;
 
         axes(ha(c)); hold on; grid on;
-        % title('Prediction','FontWeight','normal');
         surfiso(plot_matrix{idx1,idx2},f{idx1,idx2},plotopt,'zlabel',zlab{c});
         plot3(test_matrix{idx1,idx2}(:,1),test_matrix{idx1,idx2}(:,2),f_point{idx1,idx2},plotopt2);
 
