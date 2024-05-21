@@ -11,6 +11,71 @@ function [N,N_grad]=noisecov(data_matrix,model)
 % N_grad: gradient of N wrt. sigma_v
 %
 
+
+% Model 1: uniform noise on TF
+%
+% |y| = |K^2*ADs|+|vs|
+%       |K^2*ADd|+|vd|
+%
+% Cov(V)=sigma^2*diag(I,I)
+%
+% -------------------------------------
+%
+% Model 2: separate noise on TF
+%
+% |y| = |K^2*ADs|+|vs|
+%       |K^2*ADd|+|vd|
+%
+% Cov(V)=diag(sigma1^2*I,sigma2^2*I)
+%
+% -------------------------------------
+%
+% Model 3: separate noise, on aerodyn stiffness and damping
+%
+% |y'| = |K^2*ADs|+|vs|
+%        |K*ADd|  +|vd|
+%
+% |y|  = |K^2*ADs|+|vs|
+%        |K^2*ADd|+|K*vd|
+%
+% Cov(V)=diag(sigma1^2*I,K*sigma2^2*I)
+%
+% -------------------------------------
+%
+% Model 3w: same as 3, but added white noise on last term
+%
+% |y'| = |K^2*ADs|+|vs|
+%        |K*ADd|  +|vd|
+%
+% |y|  = |K^2*ADs|+|vs|
+%        |K^2*ADd|+|K*vd|+|wd|
+%
+% Cov(V)=diag(sigma1^2*I,K*sigmad^2*I)+diag(0,K*sigma2^2*I)
+%
+% -------------------------------------
+%
+% Model 4: separate noise, on ADs
+%
+% |y'| = |ADs|+|vs|
+%        |ADd|  +|vd|
+%
+% |y|  = |K^2*ADs|+|K^2*vs|
+%        |K^2*ADd|+|K^2*vd|
+%
+% Cov(V)=diag(K^2*sigma1^2*I,K^2*sigma2^2*I)
+%
+% -------------------------------------
+%
+% Model 4w: same as 4, but added white noise on both terms
+%
+% |y|  = |K^2*ADs|+|K^2*vs|+|ws|
+%        |K^2*ADd|+|K^2*vd|+|wd|
+%
+% Cov(V)=diag(K^2*sigma1^2*I,K^2*sigma2^2*I)
+%
+% -------------------------------------
+%
+
 %%
 
 n=size(data_matrix,1);
@@ -39,9 +104,9 @@ end
 
 if strcmpi(model.noise,'model1')
 
-    N=model.hyp.sigma_v^2*eye(n);
+    N=model.hyp.sigma_v^2*eye(2*n);
 
-    N_grad{1}=2*model.hyp.sigma_v(1)*eye(n);
+    N_grad{1}=2*model.hyp.sigma_v(1)*eye(2*n);
 
 elseif strcmpi(model.noise,'model2')
 
