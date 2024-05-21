@@ -1,4 +1,4 @@
-function model=modelopt(varargin)
+function model=modeloptions(varargin)
 
 %% Create options for model: kernel, noise, hyperparameters, bounds, ...
 %
@@ -74,7 +74,7 @@ model.delta_d=p.Results.delta_d;
 
 %%
 
-model=modelopt_fix(model);
+model=modeloptions_fix(model);
 
 
 
