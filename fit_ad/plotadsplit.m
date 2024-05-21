@@ -24,9 +24,10 @@ addParameter(p,'marker','o',@ichar)
 addParameter(p,'markersize',3,@isnumeric)
 addParameter(p,'color',[0 0 0 ; 0 0 1],@isnumeric)
 addParameter(p,'n_sd',[2],@isnumeric)
-addParameter(p,'xlabel','K',@ischar)
-addParameter(p,'ylabel',{'K^2 AD_{stiffness}' 'K^2 AD_{damping}'},@iscell)
+addParameter(p,'xlabel','$K$',@ischar)
+addParameter(p,'ylabel',{'$K^2 AD_{stiffness}$' '$K^2 AD_{damping}$'},@iscell)
 addParameter(p,'title',{''},@iscell)
+addParameter(p,'interpreter','',@ischar)
 
 parse(p,varargin{:})
 
@@ -84,8 +85,8 @@ for k=1:n
         h_shade=plotci(K_pred,yr_pred,std_yr_obs,n_sd,'Color',[0.25 0.25 0.25],'displayname',displayname2);
     end
     
-    xlabel(xlab);
-    if k==1; ylabel(ylab{1}); end
+    xlabel(xlab,'interpreter','latex');
+    if k==1; ylabel(ylab{1},'interpreter','latex'); end
     axistight(gca,[0 0.05],'x','y');
 
     if ~isempty(tit)
@@ -102,8 +103,8 @@ for k=1:n
         h_shade=plotci(K_pred,yi_pred,std_yi_obs,n_sd,'Color',[0.25 0.25 0.25]);
     end
     
-    xlabel(xlab);
-    if k==1; ylabel(ylab{2}); end
+    xlabel(xlab,'interpreter','latex');
+    if k==1; ylabel(ylab{2},'interpreter','latex'); end
     axistight(gca,[0 0.05],'x','y');
 
 end
