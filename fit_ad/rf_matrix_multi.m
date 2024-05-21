@@ -60,13 +60,13 @@ for k=1:nx
     end
 
 end
-D_glob=[blkdiag2(Dr_blk{:},'sparse') ; blkdiag2(Di_blk{:},'sparse')];
+D_glob=[blkdiag2(Dr_blk{:},'full') ; blkdiag2(Di_blk{:},'full')];
 
 if return_grad
     D_glob_grad=cell(length(d),1);
     for j=1:length(d)
         
-        D_glob_grad{j}=[blkdiag2(Dr_grad_blk{:,j},'sparse') ; blkdiag2(Di_grad_blk{:,j},'sparse')];
+        D_glob_grad{j}=[blkdiag2(Dr_grad_blk{:,j},'full') ; blkdiag2(Di_grad_blk{:,j},'full')];
 
     end
 end
