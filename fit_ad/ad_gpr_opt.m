@@ -32,15 +32,15 @@ if isempty(model.lb.L); model.lb.L=expandcol(L_char*1e-1,model.na); end
 if isempty(model.ub.L); model.ub.L=expandcol(L_char*1e1,model.na); end
 
 if ~isempty(model.idx.alpha)
-if isempty(model.ini.alpha); model.ini.alpha=expandcol(1e0,model.na); end
-if isempty(model.lb.alpha); model.lb.alpha=expandcol(1e-1,model.na); end
-if isempty(model.ub.alpha); model.ub.alpha=expandcol(1e1,model.na); end
+    if isempty(model.ini.alpha); model.ini.alpha=expandcol(1e0,model.na); end
+    if isempty(model.lb.alpha); model.lb.alpha=expandcol(1e-1,model.na); end
+    if isempty(model.ub.alpha); model.ub.alpha=expandcol(1e1,model.na); end
 end
 
 if ~isempty(model.idx.abar)
-if isempty(model.ini.abar); model.ini.abar=expandcol(y_mean*1e0,model.na); end
-if isempty(model.lb.abar); model.lb.abar=expandcol(y_mean*1e-1,model.na); end
-if isempty(model.ub.abar); model.ub.abar=expandcol(y_mean*1e1,model.na); end
+    if isempty(model.ini.abar); model.ini.abar=expandcol(y_mean*1e0,model.na); end
+    if isempty(model.lb.abar); model.lb.abar=expandcol(y_mean*1e-1,model.na); end
+    if isempty(model.ub.abar); model.ub.abar=expandcol(y_mean*1e1,model.na); end
 end
 
 %% Assign initial and bounds
@@ -91,7 +91,7 @@ y=[yt_r ; yt_i];
 
 fun_obj= @(theta) ad_gpr_loglik_wrapper(test_matrix,y,model,theta);
 
-options = optimoptions('fmincon','Display','iter','TypicalX',theta0,'ConstraintTolerance',1e-3,'OptimalityTolerance',1e-3,'StepTolerance',1e-3... ); %,...
+options = optimoptions('fmincon','Display','iter','TypicalX',theta0,'ConstraintTolerance',1e-3,'OptimalityTolerance',1e-3,'StepTolerance',1e-3...
     ,'CheckGradients',false,'Algorithm','interior-point','SpecifyObjectiveGradient',true);
 % interior-point
 % trust-region-reflective
@@ -99,7 +99,7 @@ options = optimoptions('fmincon','Display','iter','TypicalX',theta0,'ConstraintT
 
 % Ax<b
 % d[i+1]-d[i]>delta_d -> -d[i+1]+d[i]<delta_d
-% sigma_a> f*sigma_v -> -sigma_a+f*sigma_v<0 
+% sigma_a> f*sigma_v -> -sigma_a+f*sigma_v<0
 
 % Constraint to separate poles d
 A1=zeros(model.nd-1,length(theta0));
@@ -132,10 +132,10 @@ end
 %%
 
 if globalsearch
-    
+
     problem = createOptimProblem('fmincon','objective',fun_obj,'x0',theta0,...
         'lb',theta_lb,'ub',theta_ub,'Aineq',A,'bineq',b,'options',options);
-    
+
     gs=GlobalSearch;
     gs.BasinRadiusFactor=0.5;
     gs.FunctionTolerance=1e-3;
@@ -143,13 +143,13 @@ if globalsearch
     gs.StartPointsToRun='bounds-ineqs';
     gs.NumStageOnePoints=200; %200
     gs.NumTrialPoints=1000; %1000
-    
+
     % t0=tic;
     [theta_opt_glob,logL_opt,~,~,manymins]=run(gs,problem);
     % t1=toc(t0);
-    
+
     theta_opt=theta_opt_glob;
-    
+
 end
 
 %%
@@ -170,5 +170,5 @@ model.hyp.abar=abar_opt;
 
 model=orderstruct(model);
 
-[neg_logL,neg_logL_grad]= ad_gpr_loglik_wrapper(test_matrix,y,model,theta_opt);
+[neg_logL,neg_logL_grad]=ad_gpr_loglik_wrapper(test_matrix,y,model,theta_opt);
 neg_logL_grad_norm=neg_logL_grad./theta_opt;
