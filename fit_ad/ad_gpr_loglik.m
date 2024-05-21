@@ -25,7 +25,7 @@ gradient=p.Results.gradient;
 if isempty(model.idx.abar)
     e=y;
 else
-    m=repmat(model.abar,length(xt_uni),1);
+    m=repmat(model.hyp.abar,length(xt_uni),1);
     e=y-D_glob*m;
 end
 

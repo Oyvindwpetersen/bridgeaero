@@ -15,7 +15,7 @@ Ka_star_t=blkdiag2(Ka_star_t_blk{:});
 Ka_star_t=Sp*Ka_star_t*St.';
 
 if strcmpi(model.basis,'constant')
-    a_mean_pred=repmat(model.abar,length(xp_uni),1);
+    a_mean_pred=repmat(model.hyp.abar,length(xp_uni),1);
     a_pred=a_mean_pred+Ka_star_t*beta;
 else
     a_pred=Ka_star_t*beta;
