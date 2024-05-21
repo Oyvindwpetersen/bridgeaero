@@ -68,7 +68,7 @@ end
 Ky=(D_glob*Ka*D_glob.'+N);
 
 if strcmpi(model.basis,'constant')
-    tmp=repmat(model.abar,length(xt_uni),1);
+    tmp=repmat(model.hyp.abar,length(xt_uni),1);
     e=y-D_glob*tmp;
 else
     e=y;
