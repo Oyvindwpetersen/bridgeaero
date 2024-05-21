@@ -15,21 +15,22 @@ function B=blkdiag2(varargin)
 
 %%
 
-% Assume supplied string at end implies sparse (if sparse input)
+do_sparse=false;
+n_blk=nargin;
+
 if isstr(varargin{end})
-    do_sparse=true;
-else
-    do_sparse=false;
+    n_blk=n_blk-1;
+
+    if strcmpi(varargin{end},'sparse')
+        do_sparse=true;
+    end
 end
 
 % Call internal blkdiag
-if do_sparse
 
-    B=matlab.internal.math.blkdiag(varargin{1:end-1});
+B=matlab.internal.math.blkdiag(varargin{1:n_blk});
 
-else
-
-    B=matlab.internal.math.blkdiag(varargin{:});
+if do_sparse==false
 
     % If sparse, make full
     if issparse(B)
