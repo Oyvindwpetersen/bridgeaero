@@ -71,16 +71,3 @@ if return_grad
     end
 end
 
-
-%% Gradient
-
-% if nargout>2
-%
-%     for k=1:nx
-%        K_vec=data_matrix(bins{k},1);
-%     end
-%
-%
-%
-% end
-
