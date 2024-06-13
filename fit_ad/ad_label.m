@@ -23,16 +23,19 @@ ad_label_s{3,1}='A_6'; ad_label_s{3,2}='A_4'; ad_label_s{3,3}='A_3';
 dollar='$';
 
 if type==1
-
+    k_squared='';
 elseif type==2
-    for idx1=1:3
-        for idx2=1:3
+    k_squared=' K^2';
+end
 
-            ad_label_d{idx1,idx2}=[dollar ad_label_d{idx1,idx2} ' K^2' dollar];
-            ad_label_s{idx1,idx2}=[dollar ad_label_s{idx1,idx2} ' K^2' dollar];
-        end
+for idx1=1:3
+    for idx2=1:3
+
+        ad_label_d{idx1,idx2}=[dollar ad_label_d{idx1,idx2} k_squared dollar];
+        ad_label_s{idx1,idx2}=[dollar ad_label_s{idx1,idx2} k_squared dollar];
     end
 end
+
 
 if any(idx)>3 | any(idx)<1
     error('idx must contain 1,2 and 3 only');
