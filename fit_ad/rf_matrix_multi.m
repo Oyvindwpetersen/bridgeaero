@@ -1,6 +1,5 @@
 function [D_glob,x_uni,D_glob_grad]=rf_matrix_multi(data_matrix,d)
-%% Regression matrix in fit of aerodynamic derivatives using rational functions
-% for multiple x
+%% Regression matrix in fit of aerodynamic derivatives using rational functions for multiple x
 %
 % Inputs:
 % data_matrix: [M,2] matrix with K and x as columns

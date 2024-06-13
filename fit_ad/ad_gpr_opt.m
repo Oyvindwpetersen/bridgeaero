@@ -1,8 +1,20 @@
-function [model,logL_opt,neg_logL_grad,neg_logL_grad_norm]=ad_gpr_opt(test_matrix,yt_r,yt_i,model,varargin)
+function [model,logL_opt,neg_logL_grad,neg_logL_hess,theta_opt]=ad_gpr_opt(test_matrix,yr_t,yr_i,model,varargin)
 
-%% Optimization
+%% Optimization of GPR model for ADs
 %
 % Inputs:
+% test_matrix: [M,2] matrix with K and x as columns
+% yr_t: [M,1] vector with K^2*AD_stiffness
+% yr_i: [M,1] vector with K^2*AD_damping
+% model: struct with GPR model
+%
+% Outputs:
+% model: struct with GPR model (optimized)
+% neg_logL: -log(L)
+% neg_logL_grad: gradient of -log(L) wrt. hyperparameters
+% neg_logL_hess: hessian of -log(L) wrt. hyperparameters
+% theta_opt: optimized hyperparameters
+%
 
 %%
 
@@ -13,64 +25,71 @@ parse(p,varargin{:})
 
 globalsearch=p.Results.globalsearch;
 
-%%
+%%  Ensure cell
 
-y_std=std([yt_r;yt_i]);
-L_char=max(test_matrix(:,2))-min(test_matrix(:,2));
-y_mean=mean([yt_r;yt_i]);
+cell_check=[iscell(test_matrix) iscell(yr_t) iscell(yr_i)];
 
-if isempty(model.ini.sigma_v); model.ini.sigma_v=expandcol(y_std*1e-2,model.nv); end
-if isempty(model.lb.sigma_v); model.lb.sigma_v=expandcol(y_std*1e-3,model.nv); end
-if isempty(model.ub.sigma_v); model.ub.sigma_v=expandcol(y_std*1e0,model.nv); end
-
-if isempty(model.ini.sigma); model.ini.sigma=expandcol(y_std*1e0,model.na); end
-if isempty(model.lb.sigma); model.lb.sigma=expandcol(y_std*1e-1,model.na); end
-if isempty(model.ub.sigma); model.ub.sigma=expandcol(y_std*1e1,model.na); end
-
-if isempty(model.ini.L); model.ini.L=expandcol(L_char*1e0,model.na); end
-if isempty(model.lb.L); model.lb.L=expandcol(L_char*1e-1,model.na); end
-if isempty(model.ub.L); model.ub.L=expandcol(L_char*1e1,model.na); end
-
-if ~isempty(model.idx.alpha)
-    if isempty(model.ini.alpha); model.ini.alpha=expandcol(1e0,model.na); end
-    if isempty(model.lb.alpha); model.lb.alpha=expandcol(1e-1,model.na); end
-    if isempty(model.ub.alpha); model.ub.alpha=expandcol(1e1,model.na); end
+if all(cell_check)
+    % OK
+    cell_out=true;
+elseif ~any(cell_check)
+    cell_out=false;
+    test_matrix={test_matrix};
+    yr_t={yr_t};
+    yr_i={yr_i};
+else
+    error('All or none of inputs must be cell');
 end
 
-if ~isempty(model.idx.abar)
-    if isempty(model.ini.abar); model.ini.abar=expandcol(y_mean*1e0,model.na); end
-    if isempty(model.lb.abar); model.lb.abar=expandcol(y_mean*1e-1,model.na); end
-    if isempty(model.ub.abar); model.ub.abar=expandcol(y_mean*1e1,model.na); end
+n1=size(test_matrix,1);
+n2=size(test_matrix,2);
+
+% If model is struct, then copy to all cells
+if ~iscell(model)
+    model_tmp=model; clear model
+    for idx1=1:n1
+        for idx2=1:n2
+            model{idx1,idx2}=model_tmp;
+        end
+    end
 end
 
-%% Assign initial and bounds
+%% Assign default initial values and bounds for hyperparameter
 
-theta0(model.idx.d,1)=model.ini.d;
-theta0(model.idx.sigma_v,1)=model.ini.sigma_v;
-theta0(model.idx.sigma,1)=model.ini.sigma;
-theta0(model.idx.L,1)=model.ini.L;
-theta0(model.idx.alpha,1)=model.ini.alpha0;
-theta0(model.idx.abar,1)=model.ini.abar0;
+for idx1=1:n1
+    for idx2=1:n2
+        model{idx1,idx2}=hypdefault2model(test_matrix{idx1,idx2},yr_t{idx1,idx2},yr_i{idx1,idx2},model{idx1,idx2});
+    end
+end
 
-theta_lb(model.idx.d,1)=model.lb.d;
-theta_lb(model.idx.sigma_v,1)=model.lb.sigma_v;
-theta_lb(model.idx.sigma,1)=model.lb.sigma;
-theta_lb(model.idx.L,1)=model.lb.L;
-theta_lb(model.idx.alpha,1)=model.lb.alpha;
-theta_lb(model.idx.abar,1)=model.lb.abar;
+%% Build initial and bounds
 
-theta_ub(model.idx.d,1)=model.ub.d;
-theta_ub(model.idx.sigma_v,1)=model.ub.sigma_v;
-theta_ub(model.idx.sigma,1)=model.ub.sigma;
-theta_ub(model.idx.L,1)=model.ub.L;
-theta_ub(model.idx.alpha,1)=model.ub.alpha;
-theta_ub(model.idx.abar,1)=model.ub.abar;
+offset=model{1,1}.nd;
 
-if any(theta_lb>=theta_ub)
+theta0=[]; theta_lb=[]; theta_ub=[]; 
+for idx1=1:n1
+    for idx2=1:n2
 
-    idx=find(theta_lb>theta_ub)
-    error('theta lower bounds exceed upper bounds for elements index displayed above');
+        [theta0_loc,theta_lb_loc,theta_ub_loc]=hypbounds(model{idx1,idx2});
+        
+        model{idx1,idx2}.idx.glob=[ [1:model{1,1}.nd] offset+[1:length(theta0_loc(model{1,1}.nd+1:end))] ];
 
+        offset=offset+length(theta0_loc(model{1,1}.nd+1:end));
+
+        theta0(model{idx1,idx2}.idx.glob,1)=theta0_loc;
+        theta_lb(model{idx1,idx2}.idx.glob,1)=theta_lb_loc;
+        theta_ub(model{idx1,idx2}.idx.glob,1)=theta_ub_loc;
+
+        if any(theta_lb_loc>=theta_ub_loc)
+
+            idx1
+            idx2
+            idx=find(theta_lb_loc>theta_ub_loc)
+            error('theta lower bounds exceed upper bounds for elements index displayed above');
+
+        end
+
+    end
 end
 
 %%
@@ -87,49 +106,68 @@ end
 
 %%
 
-y=[yt_r ; yt_i];
+% for idx1=1:n1
+%     for idx2=1:n2
+%         y{idx1,idx2}=[yr_t{idx1,idx2} ; yr_i{idx1,idx2}];
+%     end
+% end
 
-fun_obj= @(theta) ad_gpr_loglik_wrapper(test_matrix,y,model,theta);
+% [neg_logL_test,neg_logL_grad_test]=ad_gpr_loglik_wrapper(test_matrix,yr_t,yr_i,model,theta0);
 
-options = optimoptions('fmincon','Display','iter','TypicalX',theta0,'ConstraintTolerance',1e-3,'OptimalityTolerance',1e-3,'StepTolerance',1e-3...
-    ,'CheckGradients',false,'Algorithm','interior-point','SpecifyObjectiveGradient',true);
-% interior-point
-% trust-region-reflective
+fun_obj= @(theta) ad_gpr_loglik_wrapper(test_matrix,yr_t,yr_i,model,theta);
 
+options = optimoptions('fmincon','Display','iter','TypicalX',theta0,'ConstraintTolerance',1e-3,'OptimalityTolerance',1e-3,'StepTolerance',1e-3,...
+    'CheckGradients',false,'Algorithm','interior-point','SpecifyObjectiveGradient',true);
 
 % Ax<b
 % d[i+1]-d[i]>delta_d -> -d[i+1]+d[i]<delta_d
 % sigma_a> f*sigma_v -> -sigma_a+f*sigma_v<0
 
 % Constraint to separate poles d
-A1=zeros(model.nd-1,length(theta0));
-for k=1:(model.nd-1)
+A1=zeros(model{1,1}.nd-1,length(theta0));
+for k=1:(model{1,1}.nd-1)
     A1(k,k-1+[1:2])=[1 -1];
 end
-b1=-model.delta_d*ones(model.nd-1,1);
+b1=-model{1,1}.delta_d*ones(model{1,1}.nd-1,1);
 
-f=1;
+for idx1=1:n1
+    for idx2=1:n2
 
-count=0;
-A2=zeros(length(model.idx.sigma)*length(model.idx.sigma_v),length(theta0));
-for k1=1:length(model.idx.sigma_v)
-    for k2=1:length(model.idx.sigma)
-        count=count+1;
-        A2(count,[model.idx.sigma_v(k1) model.idx.sigma(k2) ])=[f -1];
+        f=1;
+        count=0;
+        A2=zeros(length(model{idx1,idx2}.idx.sigma)*length(model{idx1,idx2}.idx.sigma_v),length(theta0));
+        for k1=1:length(model{idx1,idx2}.idx.sigma_v)
+            for k2=1:length(model{idx1,idx2}.idx.sigma)
+                count=count+1;
+                A2(count,model{idx1,idx2}.idx.glob([model{idx1,idx2}.idx.sigma_v(k1) model{idx1,idx2}.idx.sigma(k2) ]))=[f -1];
+            end
+        end
+        b2=zeros(size(A2,1),1);
+
+        A2_all{idx1,idx2}=A2;
+        b2_all{idx1,idx2}=b2;
+
     end
 end
-b2=zeros(size(A2,1),1);
 
-A=[A1;A2];
-b=[b1;b2];
+A=[A1;cell2mat(A2_all(:))];
+b=[b1;cell2mat(b2_all(:))];
+
+% options2=options; options2.MaxIterations=10;
+% rng(0);
+% for k=1:20
+%     d0=sort(rand(3,1).*(model{1,1}.ub.d-model{1,1}.lb.d)+model{1,1}.lb.d)
+%     d0_all(k,:)=d0;
+% 
+%     theta0_2=theta0; theta0_2(1:3)=d0;
+%     [theta_opt,logL_opt(k)]=fmincon(fun_obj,theta0_2,A,b,[],[],theta_lb,theta_ub,[],options2);
+% end
+
+%% Perform optimization
 
 if ~globalsearch
-
     [theta_opt,logL_opt]=fmincon(fun_obj,theta0,A,b,[],[],theta_lb,theta_ub,[],options);
-
 end
-
-%%
 
 if globalsearch
 
@@ -141,34 +179,29 @@ if globalsearch
     gs.FunctionTolerance=1e-3;
     gs.XTolerance=1e-3;
     gs.StartPointsToRun='bounds-ineqs';
-    gs.NumStageOnePoints=200; %200
-    gs.NumTrialPoints=1000; %1000
+    gs.NumStageOnePoints=20; % 200;
+    gs.NumTrialPoints=100; % 1000;
 
-    % t0=tic;
-    [theta_opt_glob,logL_opt,~,~,manymins]=run(gs,problem);
-    % t1=toc(t0);
-
-    theta_opt=theta_opt_glob;
+    [theta_opt,logL_opt,~,~,manymins]=run(gs,problem);
 
 end
 
+%% Assign
+
+for idx1=1:n1
+    for idx2=1:n2
+
+        theta_loc=theta_opt(model{idx1,idx2}.idx.glob);
+        model{idx1,idx2}=hyp2model(model{idx1,idx2},theta_loc);
+
+        model{idx1,idx2}=orderstruct(model{idx1,idx2});
+    end
+end
+
+[neg_logL,neg_logL_grad,neg_logL_hess]=ad_gpr_loglik_wrapper(test_matrix,yr_t,yr_i,model,theta_opt);
+
 %%
 
-d_opt=theta_opt(model.idx.d);
-sigma_v_opt=theta_opt(model.idx.sigma_v);
-sigma_opt=theta_opt(model.idx.sigma);
-L_opt=theta_opt(model.idx.L);
-alpha_opt=theta_opt(model.idx.alpha);
-abar_opt=theta_opt(model.idx.abar);
-
-model.hyp.d=d_opt;
-model.hyp.sigma_v=sigma_v_opt;
-model.hyp.sigma=sigma_opt;
-model.hyp.L=L_opt;
-model.hyp.alpha=alpha_opt;
-model.hyp.abar=abar_opt;
-
-model=orderstruct(model);
-
-[neg_logL,neg_logL_grad]=ad_gpr_loglik_wrapper(test_matrix,y,model,theta_opt);
-neg_logL_grad_norm=neg_logL_grad./theta_opt;
+if cell_out==false
+    model=model{1,1};
+end

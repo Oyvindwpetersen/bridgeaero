@@ -1,12 +1,11 @@
 function [K,K_grad]=kernel_se(X1,X2,sigma,L)
-
 %% Squared exponential kernel
 %
 % Inputs:
-% X1: [n1,m] matrix with inputs as columns
-% X2: [n2,m] matrix with inputs as columns
+% X1: [n1,1] matrix with inputs as columns
+% X2: [n2,1] matrix with inputs as columns
 % sigma: magnitude parameter
-% L: [1,m] vector with length scales
+% L: length scale
 %
 % Outputs:
 % K: covariance matrix
@@ -46,19 +45,3 @@ if size(X1,2)==1
 
     end
 end
-
-    %% Case X1 and X2 are matrices
-
-
-    %     % If
-    %     for n=2:length(L)
-    %
-    %         K_grad{n+2}=absdist(X1(:,n),X2(:,n),2)./L(n)^3.*K;
-    %
-    %     end
-    %
-    % n=1;
-    %
-    % for n=1:length(L)
-    %     K=K.*exp(-0.5*absdist(X1(:,n),X2(:,n),2)/L(n)^2);
-    % end

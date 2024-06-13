@@ -21,7 +21,7 @@ n_blk=nargin;
 if isstr(varargin{end})
     n_blk=n_blk-1;
 
-    if strcmpi(varargin{end},'sparse')
+    if strcmpi(varargin{end},'sparse') || strcmpi(varargin{end},'s') 
         do_sparse=true;
     end
 end

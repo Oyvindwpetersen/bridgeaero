@@ -6,7 +6,7 @@ function surfisomulti(plot_matrix,f,test_matrix,f_point,varargin)
 % plot_matrix: [n1,n2] cell with input data matrices (columns)
 % f: [n1,n2] cell with surface function data (columns)
 % test_matrix: [n1,n2] cell with test data matrices (columns)
-% test_matrix: [n1,n2] cell with discrete test data (columns)
+% f_point: [n1,n2] cell with discrete test data (columns)
 %
 % Outputs:
 %
@@ -123,8 +123,10 @@ for idx1=1:n1
 
         c=c+1;
 
+        zl=zlab{idx1,idx2}; 
+
         axes(ha(c)); hold on; grid on;
-        surfiso(plot_matrix{idx1,idx2},f{idx1,idx2},plotopt,'zlabel',zlab{c});
+        surfiso(plot_matrix{idx1,idx2},f{idx1,idx2},plotopt,'zlabel',zl);
         plot3(test_matrix{idx1,idx2}(:,1),test_matrix{idx1,idx2}(:,2),f_point{idx1,idx2},plotopt2);
 
     end

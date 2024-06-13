@@ -1,25 +1,28 @@
-function [Ka,Ky,beta,xt_uni,St,D_glob,N,Ka_grad,D_glob_grad,N_grad,abar_grad]=ad_gpr(test_matrix,y,model)
+function [Ka,Ky,xt_uni,St,D_glob,N,Ka_grad,D_glob_grad,N_grad,abar_grad]=ad_gpr(test_matrix,yr,yi,model)
 
-%%
+%% Basis for Gaussian process regression for aerodynamic derivatives
 %
 % Inputs:
-% test_matrix: column vector
-% y: column vector
-% model: struct with settings
+% test_matrix: [M,2] matrix with K and x as columns
+% yr: [M,1] vector with K^2*AD_stiffness
+% yi: [M,1] vector with K^2*AD_damping
+% model: struct with GPR model
 %
 % Outputs:
 % Ka: covariance matrix for a
 % Ky: covariance matrix for y
-% beta:
-% xt_uni: unique values for
-% Sa:
-% D_glob:
-% N:
-% Ka_grad:
-% D_glob_grad:
-% N_grad:
+% xt_uni: unique values for x
+% St: repopulation matrix for test data
+% D_glob: regression matrix for test data
+% N: covariance matrix for test data
+% Ka_grad: gradient of Ka
+% D_glob_grad: gradient of D_glob
+% N_grad: gradient of N
+%
 
 %%
+
+y=[yr;yi];
 
 if size(test_matrix,1)~=length(y)/2
     error('Test matrix or data vector y has wrong size');
@@ -30,8 +33,6 @@ end
 [St,St_inv]=restack_a(model.na,length(xt_uni));
 
 %%
-
-[N,N_grad]=noisecov(test_matrix,model);
 
 % Kernel for a_restack
 % a_restack=[a1(x1) a1(x2) .... a1(xN) , a2(x1) a2(x2) ... a2(xN) , a3(x1) a3(x2) ... a3(xN)];
@@ -54,6 +55,14 @@ for n=1:size(Ka_grad_tmp,1)
     end
 end
 
+% Noise covariance
+[N,N_grad]=noisecov(test_matrix,model);
+
+% Covariance
+Ky=(D_glob*Ka*D_glob.'+N);
+
+%% Mean value
+
 if strcmpi(model.basis,'constant')
     for k=1:model.na
         tmp=sparse(model.na,1); tmp(k)=1;
@@ -62,19 +71,4 @@ if strcmpi(model.basis,'constant')
 else
     abar_grad={};
 end
-
-%%
-
-Ky=(D_glob*Ka*D_glob.'+N);
-
-if strcmpi(model.basis,'constant')
-    tmp=repmat(model.hyp.abar,length(xt_uni),1);
-    e=y-D_glob*tmp;
-else
-    e=y;
-end
-
-beta=(D_glob).'/Ky*e;
-
-%%
 

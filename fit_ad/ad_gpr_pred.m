@@ -1,57 +1,74 @@
-function [y_pred,yr_pred,yi_pred,std_yr_pred,std_yi_pred,std_yr_obs,std_yi_obs,a_pred,cov_a_pred]=ad_gpr_pred(test_matrix,pred_matrix,y,model)
+function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gpr_pred(test_matrix,pred_matrix,yr_t,yr_i,model)
+%% Predict using GPR model
+%
+% Inputs:
+% test_matrix: [M,2] matrix with K and x as columns
+% pred_matrix: [N,2] matrix with K and x as columns
+% yr_t: [M,1] vector with K^2*AD_stiffness
+% yr_i: [M,1] vector with K^2*AD_damping
+% model: struct with GPR model
+%
+% Outputs:
+% yr_p: [N,1] vector with K^2*AD_stiffness
+% yi_p: [N,1] vector with K^2*AD_damping
+% std_yr_p: [N,1] vector with SD of yr_p
+% std_yi_p: [N,1] vector with SD of yi_p
+% std_yr_p_obs: [N,1] vector with SD of yr_p (+noise)
+% std_yi_p_obs: [N,1] vector with SD of yr_p (+noise)
+% ap: predicted a coefficients
+%
+%
 
 %%
 
+cell_check=[iscell(test_matrix) iscell(pred_matrix) iscell(yr_t) iscell(yr_i) iscell(model)];
 
-%%
-
-[Ka,Ky,beta,xt_uni,St,D_glob]=ad_gpr(test_matrix,y,model);
-
-[D_glob_pred,xp_uni]=rf_matrix_multi(pred_matrix,model.hyp.d);
-[Sp]=restack_a(model.na,length(xp_uni));
-
-[Ka_star_t_blk]=kernel_cov(xp_uni,xt_uni,model.kernel,model.hyp);
-Ka_star_t=blkdiag2(Ka_star_t_blk{:});
-Ka_star_t=Sp*Ka_star_t*St.';
-
-if strcmpi(model.basis,'constant')
-    a_mean_pred=repmat(model.hyp.abar,length(xp_uni),1);
-    a_pred=a_mean_pred+Ka_star_t*beta;
+if all(cell_check)
+    % OK
+    cell_out=true;
+elseif ~any(cell_check)
+    cell_out=false;
+    test_matrix={test_matrix};
+    pred_matrix={pred_matrix};
+    yr_t={yr_t};
+    yr_i={yr_i};
+    model={model};
 else
-    a_pred=Ka_star_t*beta;
+    error('All or none of inputs must be cell');
 end
 
-y_pred=D_glob_pred*a_pred;
+n1=size(test_matrix,1);
+n2=size(test_matrix,2);
 
-yr_pred=y_pred(1:length(y_pred)/2);
+%% Predict ADs for a
 
-yi_pred=y_pred((length(y_pred)/2+1):end);
+for idx1=1:n1
+    for idx2=1:n2
 
-%% Uncertainty
+        [yr_p_loc,yi_p_loc,std_yr_p_loc,std_yi_p_loc,std_yr_p_obs_loc,std_yi_p_obs_loc,ap_loc,cov_ap_loc]=...
+            ad_gpr_pred_single(test_matrix{idx1,idx2},pred_matrix{idx1,idx2},yr_t{idx1,idx2},yr_i{idx1,idx2},model{idx1,idx2});
 
-[Ka_star_star_blk]=kernel_cov(xp_uni,xp_uni,model.kernel,model.hyp);
-Ka_star_star=blkdiag2(Ka_star_star_blk{:});
-Ka_star_star=Sp*Ka_star_star*Sp.';
+        yr_p{idx1,idx2}=yr_p_loc;
+        yi_p{idx1,idx2}=yi_p_loc;
+        std_yr_p{idx1,idx2}=std_yr_p_loc;
+        std_yi_p{idx1,idx2}=std_yi_p_loc;
+        std_yr_p_obs{idx1,idx2}=std_yr_p_obs_loc;
+        std_yi_p_obs{idx1,idx2}=std_yi_p_obs_loc;
+        ap{idx1,idx2}=ap_loc;
+        cov_ap{idx1,idx2}=cov_ap_loc;
 
-% Uncertainty of a
-cov_a_pred=Ka_star_star-Ka_star_t*(D_glob).'/Ky*(D_glob)*Ka_star_t.';
+    end
+end
 
-% Uncertainty of prediction
-cov_y_pred=(D_glob_pred)*cov_a_pred*(D_glob_pred).';
+%%
 
-n=size(cov_y_pred,1);
-
-std_yr_pred=diag(cov_y_pred(1:n/2,1:n/2)).^0.5;
-std_yi_pred=diag(cov_y_pred(n/2+1:end,n/2+1:end)).^0.5;
-
-% Uncertainty of a noisy observation
-
-N=noisecov(pred_matrix,model);
-
-cov_y_obs=cov_y_pred+N;
-
-std_yr_obs=diag(cov_y_obs(1:n/2,1:n/2)).^0.5;
-std_yi_obs=diag(cov_y_obs(n/2+1:end,n/2+1:end)).^0.5;
-
-
-
+if cell_out==false
+    yr_p=yr_p{1,1};
+    yi_p=yi_p{1,1};
+    std_yr_p=std_yr_p{1,1};
+    std_yi_p=std_yi_p{1,1};
+    std_yr_p_obs=std_yr_p_obs{1,1};
+    std_yi_p_obs=std_yi_p_obs{1,1};
+    ap=ap{1,1};
+    cov_ap=cov_ap{1,1};
+end

@@ -1,12 +1,11 @@
 function model=modeloptions(varargin)
-
 %% Create options for model: kernel, noise, hyperparameters, bounds, ...
 %
 % Inputs:
-% variable inputs 
+% given below
 %
 % Outputs:
-% model: struct
+% model: struct with GPR model
 %
 
 %% Parse inputs

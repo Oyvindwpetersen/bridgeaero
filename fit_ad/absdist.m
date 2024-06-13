@@ -9,7 +9,6 @@ function r=absdist(x1,x2,power)
 % Outputs:
 % r: [n1*n2] distance matrix
 %
-%
 % r=[ |x1(1)-x2(1)|  |x1(1)-x2(2)|  ... |x1(1)-x2(n2)|  ]
 %   [       .              .                  .         ]
 %   [       .              .                  .         ]

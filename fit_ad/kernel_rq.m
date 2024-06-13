@@ -2,11 +2,11 @@ function [K,K_grad]=kernel_rq(X1,X2,sigma,L,alpha)
 %% Rational quadratic kernel
 %
 % Inputs:
-% X1: [n1,m] matrix with inputs as columns
-% X2: [n2,m] matrix with inputs as columns
+% X1: [n1,1] matrix with inputs as columns
+% X2: [n2,1] matrix with inputs as columns
 % sigma: magnitude parameter
-% L: [1,m] vector with length scales
-% alpha: [1,m] vector with powers
+% L: length scale
+% alpha: power
 %
 % Outputs:
 % K: covariance matrix
@@ -45,42 +45,3 @@ if size(X1,2)==1
     end
 
 end
-%% Case X1 and X2 are matrices
-
-
-%% Gradient
-
-% if nargout>1
-%
-%     n=1;
-%     K_grad{1}=2*sigma/sigma^2*K;
-%
-%     j=1;
-%     r=absdist(X1(:,j),X2(:,j));
-%
-%
-%
-%
-%
-%
-%
-%     K_grad{2}=absdist(X1(:,n),X2(:,n),2)./L(n)^4.* (K./ ((ones(size(r))+sqrt(5)*r/L(j)+5/3*(r/L(j)).^2).*exp(sqrt(5)*r/L(j))) );
-%
-%     for n=2:length(L)
-%
-%         K_grad{n+2}=absdist(X1(:,n),X2(:,n),2)./L(n)^3.*K; %K.*exp(-0.5*absdist(X1(:,n),X2(:,n),2)/L(n)^2);
-%
-%     end
-% end
-%
-
-
-%%
-
-% for j=2:length(L)
-% 
-%     r=absdist(X1(:,j),X2(:,j));
-% 
-%     K=K.*(ones(size(r))+sqrt(5)*r/L(j)+5/3*(r/L(j)).^2).*exp(sqrt(5)*r/L(j))
-% 
-% end

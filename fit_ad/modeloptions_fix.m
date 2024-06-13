@@ -1,4 +1,12 @@
 function model=modelopt_fix(model)
+%% Fix and check options
+%
+% Inputs:
+% model: struct with GPR model
+%
+% Outputs:
+% model: struct with GPR model
+%
 
 %%
 if ~permopt(model.kernel,{'se' 'matern52' 'rq'})

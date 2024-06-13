@@ -3,16 +3,16 @@ function [N,N_grad]=noisecov(data_matrix,model)
 %% Noise matrix
 %
 % Inputs:
-% data_matrix: [n,2] matrix with inputs as columns
-% model: struct with model valuesparameter
+% data_matrix: [M,2] matrix with K and x as columns
+% model: struct with GPR model
 %
 % Outputs:
-% N: [2n,2n] noise matrix
+% N: [2M,2M] noise matrix
 % N_grad: gradient of N wrt. sigma_v
 %
-
-
-% Model 1: uniform noise on TF
+% -------------------------------------
+%
+% Model 1: homogeneous noise on TF
 %
 % |y| = |K^2*ADs|+|vs|
 %       |K^2*ADd|+|vd|
@@ -50,13 +50,13 @@ function [N,N_grad]=noisecov(data_matrix,model)
 % |y|  = |K^2*ADs|+|vs|
 %        |K^2*ADd|+|K*vd|+|wd|
 %
-% Cov(V)=diag(sigma1^2*I,K*sigmad^2*I)+diag(0,K*sigma2^2*I)
+% Cov(V)=diag(sigma1^2*I,K*sigma2^2*I)+diag(0,sigma3^2*I)
 %
 % -------------------------------------
 %
 % Model 4: separate noise, on ADs
 %
-% |y'| = |ADs|+|vs|
+% |y'| = |ADs|  +|vs|
 %        |ADd|  +|vd|
 %
 % |y|  = |K^2*ADs|+|K^2*vs|
@@ -71,7 +71,7 @@ function [N,N_grad]=noisecov(data_matrix,model)
 % |y|  = |K^2*ADs|+|K^2*vs|+|ws|
 %        |K^2*ADd|+|K^2*vd|+|wd|
 %
-% Cov(V)=diag(K^2*sigma1^2*I,K^2*sigma2^2*I)
+% Cov(V)=diag(K^2*sigma1^2*I,K^2*sigma2^2*I)+diag(sigma3^2*I,sigma4^2*I)
 %
 % -------------------------------------
 %
@@ -89,16 +89,6 @@ if strcmpi(model.noise,'model3') | strcmpi(model.noise,'model3w') | strcmpi(mode
     K_diag=spdiags(K(:),0,numel(K),numel(K));
     K_squared_diag=K_diag.^2;
 end
-
-% if strcmpi(model.noise,'model4') | strcmpi(model.noise,'model4w')
-%     K_squared_diag=diag(K.^2);
-% end
-
-% if strcmpi(model.noise,'model_a')
-%     [D_glob,xt_uni,D_glob_grad]=rf_matrix_multi(data_matrix,model.hyp.d);
-%     nx=length(xt_uni);
-%     [S]=restack_a(model.na,length(xt_uni));
-% end
 
 %% Noise matrix
 
@@ -148,14 +138,6 @@ elseif strcmpi(model.noise,'model4w')
     N_grad{3}=blkdiag2(model.hyp.sigma_v(3)^2*In,Zn,'sparse');
     N_grad{4}=blkdiag2(Zn,model.hyp.sigma_v(4)^2*In,'sparse');
     
-% elseif strcmpi(model.noise,'model_a')
-
-    % N=blkdiag2(model.hyp.sigma_v(1)^2*In,model.hyp.sigma_v(2)^2*In);
-    %   +D_glob*S*model.hyp.sigma_v(3)^2*S.'*D_glob.';
-    % 
-    % N_grad{1}=blkdiag2(2*model.hyp.sigma_v(1)*In,Zn,'sparse');
-    % N_grad{2}=blkdiag2(Zn,2*model.hyp.sigma_v(2)*In,'sparse');
-    % N_grad{3}=D_glob*S*2*model.hyp.sigma_v(3)*S.'*D_glob.';
 else
     error(['Noise option not permissible: ' model.noise]);
 end
