@@ -72,7 +72,6 @@ std_yr_p=diag(cov_yp(1:n/2,1:n/2)).^0.5;
 std_yi_p=diag(cov_yp(n/2+1:end,n/2+1:end)).^0.5;
 
 % Uncertainty of a noisy observation
-
 N=noisecov(pred_matrix,model);
 
 cov_y_obs=cov_yp+N;

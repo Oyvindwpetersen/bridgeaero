@@ -17,7 +17,6 @@ function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gp
 % std_yi_p_obs: [N,1] vector with SD of yr_p (+noise)
 % ap: predicted a coefficients
 %
-%
 
 %%
 

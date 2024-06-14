@@ -36,7 +36,6 @@ for idx1=1:3
     end
 end
 
-
 if any(idx)>3 | any(idx)<1
     error('idx must contain 1,2 and 3 only');
 end

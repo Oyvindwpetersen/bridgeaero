@@ -1,5 +1,4 @@
 function [Ka,Ky,xt_uni,St,D_glob,N,Ka_grad,D_glob_grad,N_grad,abar_grad]=ad_gpr(test_matrix,yr,yi,model)
-
 %% Basis for Gaussian process regression for aerodynamic derivatives
 %
 % Inputs:
