@@ -4,5 +4,5 @@ Tools for bridge aerodynamics
 
 
 ## fit_ad
--Fit aerodynamic derivatives (ADs) using rational functions \
--Surrogate models for ADs can be fitted
+-Fit aerodynamic derivatives (ADs) using rational functions surrogate models
+-Python implementation to come
