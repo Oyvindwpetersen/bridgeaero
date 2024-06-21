@@ -23,6 +23,10 @@ if size(test_matrix,1)~=length(y)
     error('Test matrix or data vector y has wrong size');
 end
 
+if size(y,2)>1
+    error('Data vector y has wrong size');
+end
+
 [T_glob,xt_uni]=poly_matrix_multi(test_matrix,model.p);
 
 [St,St_inv]=restack_a(model.p+1,length(xt_uni));
@@ -39,7 +43,7 @@ Ka=St*Ka*St.';
 Ka_grad=cell(size(Ka_grad_tmp,1)*(model.p+1),1);
 idx=0;
 for n=1:size(Ka_grad_tmp,1)
-    for k=1:(model.p+1)
+    for k=1:size(Ka_grad_tmp,2)
 
         idx=idx+1;
         range=(k-1)*length(xt_uni)+[1:length(xt_uni)];
