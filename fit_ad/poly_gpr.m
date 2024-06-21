@@ -51,7 +51,7 @@ for n=1:size(Ka_grad_tmp,1)
 end
 
 % Noise covariance
-N=model.hyp.sigma_v.^2*eye(size(test_matrix,1));
+N=model.hyp.sigma_v.^2*speye(size(test_matrix,1));
 N_grad{1}=2*model.hyp.sigma_v*eye(size(test_matrix,1));
 
 % Covariance
