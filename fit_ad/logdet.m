@@ -16,6 +16,7 @@ function [log_det_A,L]=logdet(A,method)
 %%
 
 [n1,n2]=size(A);
+L=[];
 
 if n1~=n2
     error('Matrix must be square');
@@ -32,6 +33,7 @@ if isscalar(A)
     return
 end
 
+% Default svd
 if nargin==1
     method='svd';
 end
@@ -46,10 +48,9 @@ end
 
 if strcmpi(method,'svd')
     s=svd(A);
-    log_det_A=sum(log(diag(s)));
+    log_det_A=sum(log(s));
 end
 
-L=[];
 if strcmpi(method,'chol')
     L=chol(A,'lower');
     log_det_A=2*sum(log(diag(L)));
