@@ -78,6 +78,3 @@ cov_y_obs=cov_yp+N;
 
 std_yr_p_obs=diag(cov_y_obs(1:n/2,1:n/2)).^0.5;
 std_yi_p_obs=diag(cov_y_obs(n/2+1:end,n/2+1:end)).^0.5;
-
-
-
