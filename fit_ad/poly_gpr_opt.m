@@ -1,6 +1,6 @@
 function [model,neg_logL,neg_logL_grad,theta_opt]=poly_gpr_opt(test_matrix,y,model,varargin)
 
-%% Optimization of GPR model for ADs
+%% Optimization of GPR model for poly model
 %
 % Inputs:
 % test_matrix: [M,2] matrix with alpha and x as columns

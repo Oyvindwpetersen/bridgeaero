@@ -1,5 +1,5 @@
 function [Ka,Ky,xt_uni,St,T_glob,N,Ka_grad,N_grad]=poly_gpr(test_matrix,y,model)
-%% Basis for Gaussian process regression for poly
+%% Basis for Gaussian process regression for poly model
 %
 % Inputs:
 % test_matrix: [M,2] matrix with alpha and x as columns
