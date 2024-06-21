@@ -48,21 +48,11 @@ theta_ub(model.idx.L,1)=model.ub.L;
 
 % Kernel is created for restacked a
 
-% | y_r(x1,K1) | = | D_r(K1)   0     | | a(x1) |
-% | y_r(x2,K2) |   | 0       D_r(K2) | | a(x2) |
-% | y_i(x1,K1) |   | D_i(K1)    0    |
-% | y_i(x2,K2) |   |  0      D_i(K2) |
+% | y(alpha1,x1) | = | T(alpha1)   0       | | a(x1) |
+% | y(alpha2,x2) |   | 0         T(alpha2) | | a(x2) |
 %
 
 %%
-
-% for idx1=1:n1
-%     for idx2=1:n2
-%         y{idx1,idx2}=[yr_t{idx1,idx2} ; yr_i{idx1,idx2}];
-%     end
-% end
-
-% [neg_logL_test,neg_logL_grad_test]=ad_gpr_loglik_wrapper(test_matrix,yr_t,yr_i,model,theta0);
 
 fun_obj= @(theta) poly_gpr_loglik_wrapper(test_matrix,y,model,theta);
 
