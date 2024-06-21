@@ -65,7 +65,7 @@ for j=1:n_par
     if any(j==model.idx.sigma_v)
         idx=j;
         Ky_grad{j}=N_grad{idx};
-    elseif any(j==model.idx.sigma) | any(j==model.idx.L) | any(j==model.idx.alpha)
+    elseif any(j==model.idx.sigma) | any(j==model.idx.L)
         idx=j-length(model.idx.sigma_v);
         Ky_grad{j}=T_glob*Ka_grad{idx}*T_glob.';
     end

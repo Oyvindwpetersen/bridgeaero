@@ -44,5 +44,5 @@ for k=1:nx
     [T_blk{k}]=poly_matrix(alpha_vec,p);
 
 end
-T_glob=[blkdiag2(T_blk{:},'sparse')];
+T_glob=[blkdiag2(T_blk{:},'full')];
 
