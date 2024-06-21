@@ -27,6 +27,10 @@ if size(test_matrix,1)~=length(y)/2
     error('Test matrix or data vector y has wrong size');
 end
 
+if size(y,2)>1
+    error('Data vector y has wrong size');
+end
+
 [D_glob,xt_uni,D_glob_grad]=rf_matrix_multi(test_matrix,model.hyp.d);
 
 [St,St_inv]=restack_a(model.na,length(xt_uni));
