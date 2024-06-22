@@ -28,7 +28,7 @@ beta=(T_glob).'/Ky*e;
 
 [Sp]=restack_a(model.p+1,length(xp_uni));
 
-[Ka_star_t_blk]=kernel_cov(xp_uni,xt_uni,model.kernel,model.hyp);
+Ka_star_t_blk=kernel_cov(xp_uni,xt_uni,model.kernel,model.hyp);
 Ka_star_t=blkdiag2(Ka_star_t_blk{:});
 Ka_star_t=Sp*Ka_star_t*St.';
 
@@ -38,7 +38,7 @@ yp=T_glob_pred*ap;
 
 %% Uncertainty
 
-[Ka_star_star_blk]=kernel_cov(xp_uni,xp_uni,model.kernel,model.hyp);
+Ka_star_star_blk=kernel_cov(xp_uni,xp_uni,model.kernel,model.hyp);
 Ka_star_star=blkdiag2(Ka_star_star_blk{:});
 Ka_star_star=Sp*Ka_star_star*Sp.';
 
