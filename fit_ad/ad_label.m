@@ -30,7 +30,6 @@ end
 
 for idx1=1:3
     for idx2=1:3
-
         ad_label_d{idx1,idx2}=[dollar ad_label_d{idx1,idx2} k_squared dollar];
         ad_label_s{idx1,idx2}=[dollar ad_label_s{idx1,idx2} k_squared dollar];
     end
