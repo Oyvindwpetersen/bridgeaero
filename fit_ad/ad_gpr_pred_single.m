@@ -1,4 +1,4 @@
-function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gpr_pred_single(test_matrix,pred_matrix,yr,yi,model)
+function [fr_p,fi_p,std_fr_p,std_fi_p,std_yr_p,std_yi_p,ap,cov_ap]=ad_gpr_pred_single(test_matrix,pred_matrix,yr,yi,model)
 %% Predict using GPR model
 %
 % Inputs:
@@ -48,15 +48,15 @@ else
     ap=Ka_star_t*beta;
 end
 
-yp=D_glob_pred*ap;
+fp=D_glob_pred*ap;
 
-yr_p=yp(1:length(yp)/2);
+fr_p=fp(1:length(fp)/2);
 
-yi_p=yp((length(yp)/2+1):end);
+fi_p=fp((length(fp)/2+1):end);
 
 %% Uncertainty
 
-[Ka_star_star_blk]=kernel_cov(xp_uni,xp_uni,model.kernel,model.hyp);
+Ka_star_star_blk=kernel_cov(xp_uni,xp_uni,model.kernel,model.hyp);
 Ka_star_star=blkdiag2(Ka_star_star_blk{:});
 Ka_star_star=Sp*Ka_star_star*Sp.';
 
@@ -64,17 +64,17 @@ Ka_star_star=Sp*Ka_star_star*Sp.';
 cov_ap=Ka_star_star-Ka_star_t*(D_glob).'/Ky*(D_glob)*Ka_star_t.';
 
 % Uncertainty of prediction
-cov_yp=(D_glob_pred)*cov_ap*(D_glob_pred).';
+cov_fp=(D_glob_pred)*cov_ap*(D_glob_pred).';
 
-n=size(cov_yp,1);
+n=size(cov_fp,1);
 
-std_yr_p=diag(cov_yp(1:n/2,1:n/2)).^0.5;
-std_yi_p=diag(cov_yp(n/2+1:end,n/2+1:end)).^0.5;
+std_fr_p=diag(cov_fp(1:n/2,1:n/2)).^0.5;
+std_fi_p=diag(cov_fp(n/2+1:end,n/2+1:end)).^0.5;
 
 % Uncertainty of a noisy observation
 N=noisecov(pred_matrix,model);
 
-cov_y_obs=cov_yp+N;
+cov_y=cov_fp+N;
 
-std_yr_p_obs=diag(cov_y_obs(1:n/2,1:n/2)).^0.5;
-std_yi_p_obs=diag(cov_y_obs(n/2+1:end,n/2+1:end)).^0.5;
+std_yr_p=diag(cov_y(1:n/2,1:n/2)).^0.5;
+std_yi_p=diag(cov_y(n/2+1:end,n/2+1:end)).^0.5;
