@@ -1,11 +1,11 @@
-function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gpr_pred(test_matrix,pred_matrix,yr_t,yr_i,model)
+function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gpr_pred(test_matrix,pred_matrix,yr_t,yi_t,model)
 %% Predict using GPR model
 %
 % Inputs:
 % test_matrix: [M,2] matrix with K and x as columns
 % pred_matrix: [N,2] matrix with K and x as columns
 % yr_t: [M,1] vector with K^2*AD_stiffness
-% yr_i: [M,1] vector with K^2*AD_damping
+% yi_t: [M,1] vector with K^2*AD_damping
 % model: struct with GPR model
 %
 % Outputs:
@@ -20,7 +20,7 @@ function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gp
 
 %%
 
-cell_check=[iscell(test_matrix) iscell(pred_matrix) iscell(yr_t) iscell(yr_i) iscell(model)];
+cell_check=[iscell(test_matrix) iscell(pred_matrix) iscell(yr_t) iscell(yi_t) iscell(model)];
 
 if all(cell_check)
     % OK
@@ -30,7 +30,7 @@ elseif ~any(cell_check)
     test_matrix={test_matrix};
     pred_matrix={pred_matrix};
     yr_t={yr_t};
-    yr_i={yr_i};
+    yi_t={yi_t};
     model={model};
 else
     error('All or none of inputs must be cell');
@@ -45,7 +45,7 @@ for idx1=1:n1
     for idx2=1:n2
 
         [yr_p_loc,yi_p_loc,std_yr_p_loc,std_yi_p_loc,std_yr_p_obs_loc,std_yi_p_obs_loc,ap_loc,cov_ap_loc]=...
-            ad_gpr_pred_single(test_matrix{idx1,idx2},pred_matrix{idx1,idx2},yr_t{idx1,idx2},yr_i{idx1,idx2},model{idx1,idx2});
+            ad_gpr_pred_single(test_matrix{idx1,idx2},pred_matrix{idx1,idx2},yr_t{idx1,idx2},yi_t{idx1,idx2},model{idx1,idx2});
 
         yr_p{idx1,idx2}=yr_p_loc;
         yi_p{idx1,idx2}=yi_p_loc;
