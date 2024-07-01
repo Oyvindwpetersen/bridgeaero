@@ -1,4 +1,4 @@
-function surfisomulti(plot_matrix,f,test_matrix,f_point,varargin)
+function ha=surfisomulti(plot_matrix,f,test_matrix,f_point,varargin)
 
 %% Plot mulitple 2D surface with isolines
 %
@@ -131,3 +131,10 @@ for idx1=1:n1
 
     end
 end
+
+
+% for k=1:length()
+Link = linkprop([ha],{'View','XLim', 'YLim'});
+setappdata(gcf, 'StoreTheLink', Link);
+
+
