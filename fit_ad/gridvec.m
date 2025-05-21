@@ -32,6 +32,8 @@ if nargin>1 & isnumeric(varargin{1})
 end
 
 
+input_cell=flip(input_cell);
+
 %%
 
 % input_cell={[1:10] [50 60 70] [0.1 0.2]}
@@ -53,5 +55,7 @@ for i=1:length(input_cell)
         tmp=repmat(x,s);
         out(:,i)=tmp(:);
 end
+
+out=flip(out,2);
 
 x=out;
