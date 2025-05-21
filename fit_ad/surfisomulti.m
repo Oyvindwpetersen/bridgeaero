@@ -14,6 +14,7 @@ function ha=surfisomulti(plot_matrix,f,test_matrix,f_point,varargin)
 %%
 
 p=inputParser;
+p.KeepUnmatched=true;
 
 addParameter(p,'gap',[0.2 0.075])
 addParameter(p,'marg_h',[0.15 0.15])
