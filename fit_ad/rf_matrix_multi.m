@@ -38,9 +38,11 @@ end
 nx=length(x_uni);
 
 % Create bins of index for each unique x
-bins=cell(1,nx);
-for k=1:length(x_uni)
-    bins{k}=find(ic==k);
+bins = accumarray(ic, (1:numel(ic))', [], @(v){v}).';
+
+if ~issorted(data_matrix(:,2))
+    warning('The data matrix second column (e.g. height) must be sorted st. a=[a(x1) a(x2) ... a(xN)]');
+    warning('This is necessary for the construction of D_glob, where Dr and Di is build for multiple frequencies, but one x_i at a time');
 end
 
 % D-matrix for each unique x
