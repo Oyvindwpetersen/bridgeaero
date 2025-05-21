@@ -16,6 +16,7 @@ function ha=plotadsplit(test_matrix,yr_t,yr_i,model,K_pred,varargin)
 %%
 
 p=inputParser;
+p.KeepUnmatched=true;
 addParameter(p,'uncertainty',true,@islogical)
 addParameter(p,'gap',[0.2 0.125],@isnumeric)
 addParameter(p,'marg_h',[0.15 0.15],@isnumeric)
@@ -26,7 +27,7 @@ addParameter(p,'color',[0 0 0 ; 0 0 1],@isnumeric)
 addParameter(p,'n_sd',2,@isnumeric)
 addParameter(p,'xlabel','$K$',@ischar)
 addParameter(p,'ylabel',{'$K^2 AD_{stiffness}$' '$K^2 AD_{damping}$'},@iscell)
-addParameter(p,'title',{''},@iscell)
+addParameter(p,'title',{},@iscell)
 addParameter(p,'interpreter','',@ischar)
 
 parse(p,varargin{:})
