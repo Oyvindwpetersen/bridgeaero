@@ -98,10 +98,10 @@ end
 
 % Kernel is created for restacked a
 
-% | y_r(x1,K1) | = | D_r(K1)   0     | | a(x1) |
-% | y_r(x2,K2) |   | 0       D_r(K2) | | a(x2) |
-% | y_i(x1,K1) |   | D_i(K1)    0    |
-% | y_i(x2,K2) |   |  0      D_i(K2) |
+% | y_r(K1,x1) | = | D_r(K1)   0     | | a(x1) |
+% | y_r(K2,x2) |   | 0       D_r(K2) | | a(x2) |
+% | y_i(K1,x1) |   | D_i(K1)    0    |
+% | y_i(K2,x2) |   |  0      D_i(K2) |
 %
 
 %%
