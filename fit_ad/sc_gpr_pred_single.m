@@ -43,7 +43,7 @@ Ka_star_star=blkdiag2(Ka_star_star_blk{:});
 Ka_star_star=Sp*Ka_star_star*Sp.';
 
 % Uncertainty of a
-cov_ap=Ka_star_star-Ka_star_t*(T_glob).'/Ky*(T_glob)*Ka_star_t.';
+cov_ap=Ka_star_star-Ka_star_t*(T_glob).'/Ky*(T_glob)*Ka_star_t.'; cov_ap=(cov_ap+cov_ap.')/2;
 
 % Uncertainty of prediction
 cov_yp=(T_glob_pred)*cov_ap*(T_glob_pred).';
