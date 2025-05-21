@@ -20,6 +20,11 @@ function [fr_p,fi_p,std_fr_p,std_fi_p,std_yr_p,std_yi_p,ap,cov_ap]=ad_gpr_pred_s
 
 %%
 
+% pred_matrix_sorted=sortmatrix(pred_matrix,)
+[pred_matrix_sorted,x_uni,T,T_inv]=sortmatrix(pred_matrix);
+
+%%
+
 [Ka,Ky,xt_uni,St,D_glob]=ad_gpr(test_matrix,yr,yi,model);
 
 y=[yr;yi];
@@ -34,7 +39,7 @@ end
 
 beta=(D_glob).'/Ky*e;
 
-[D_glob_pred,xp_uni]=rf_matrix_multi(pred_matrix,model.hyp.d);
+[D_glob_pred,xp_uni]=rf_matrix_multi(pred_matrix_sorted,model.hyp.d);
 [Sp]=restack_a(model.na,length(xp_uni));
 
 [Ka_star_t_blk]=kernel_cov(xp_uni,xt_uni,model.kernel,model.hyp);
@@ -49,6 +54,7 @@ else
 end
 
 fp=D_glob_pred*ap;
+fp=blkdiag2(T,T,'s')*fp; % Transformation from sorted to mixed
 
 fr_p=fp(1:length(fp)/2);
 
@@ -65,6 +71,7 @@ cov_ap=Ka_star_star-Ka_star_t*(D_glob).'/Ky*(D_glob)*Ka_star_t.'; cov_ap=(cov_ap
 
 % Uncertainty of prediction
 cov_fp=(D_glob_pred)*cov_ap*(D_glob_pred).'; cov_fp=(cov_fp+cov_fp.')/2;
+cov_fp=blkdiag2(T,T,'s')*cov_fp*blkdiag2(T,T,'s').'; % Transformation from sorted to mixed
 
 n=size(cov_fp,1);
 
@@ -73,6 +80,7 @@ std_fi_p=diag(cov_fp(n/2+1:end,n/2+1:end)).^0.5;
 
 % Uncertainty of a noisy observation
 N=noisecov(pred_matrix,model);
+N=blkdiag2(T,T,'s')*N*blkdiag2(T,T,'s').'; % Transformation from sorted to mixed
 
 cov_y=cov_fp+N;
 
