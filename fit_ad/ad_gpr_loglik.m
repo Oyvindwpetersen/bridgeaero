@@ -1,4 +1,4 @@
-function [neg_logL,neg_logL_grad]=ad_gpr_loglik(test_matrix,yr,yi,model,varargin)
+function [neg_logL,neg_logL_grad,neg_logL_grad_modelfit,neg_logL_grad_complexity]=ad_gpr_loglik(test_matrix,yr,yi,model,varargin)
 
 %% Calculation of log likelihood and gradient
 %
@@ -92,6 +92,8 @@ for j=1:n_par
 end
 
 logL_grad=nan*ones(n_par,1);
+logL_grad_modelfit=nan*ones(n_par,1);
+logL_grad_complexity=nan*ones(n_par,1);
 
 
 Ky_inv=Ky\eye(size(Ky));
@@ -106,12 +108,12 @@ for j=1:n_par
 
         % logL_grad(j,1)=0.5*(Ky_inv_e).'*Ky_grad{j}*Ky_inv_e-0.5*trace(Ky_inv*Ky_grad{j});
 
-        term1=0.5*(Ky_inv_e).'*Ky_grad{j}*Ky_inv_e;
+        logL_grad_modelfit(j,1)=0.5*(Ky_inv_e).'*Ky_grad{j}*Ky_inv_e;
         % term2=-0.5*trace(Ky_inv*Ky_grad{j});
 
         % trace(A*B)=sum(sum(A.'*B^T));
-        term2=-0.5*sum(sum(Ky_inv.*Ky_grad{j}));
-        logL_grad(j,1)=term1+term2;
+        logL_grad_complexity(j,1)=-0.5*sum(sum(Ky_inv.*Ky_grad{j}));
+        logL_grad(j,1)=logL_grad_modelfit(j,1)+logL_grad_complexity(j,1);
 
     elseif any(j==model.idx.abar)
         logL_grad(j,1)=-0.5*(-D_glob*m_grad{j}).'*Ky_inv_e*2;
@@ -130,3 +132,8 @@ if any(isinf(logL_grad))
 end
 
 neg_logL_grad=-logL_grad;
+neg_logL_grad_modelfit=-logL_grad_modelfit;
+neg_logL_grad_complexity=-logL_grad_complexity;
+
+
+
