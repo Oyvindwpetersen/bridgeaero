@@ -1,4 +1,4 @@
-function [ad_label_s,ad_label_d]=ad_label(idx,type)
+function [ad_label_s,ad_label_d,ad_label_pair]=ad_label(idx,type)
 %% Labels for aerodynamic derivatives
 %
 % Inputs:
@@ -21,6 +21,7 @@ ad_label_s{2,1}='H_6'; ad_label_s{2,2}='H_4'; ad_label_s{2,3}='H_3';
 ad_label_s{3,1}='A_6'; ad_label_s{3,2}='A_4'; ad_label_s{3,3}='A_3';
 
 dollar='$';
+star='^*';
 
 if type==1
     k_squared='';
@@ -30,8 +31,10 @@ end
 
 for idx1=1:3
     for idx2=1:3
-        ad_label_d{idx1,idx2}=[dollar ad_label_d{idx1,idx2} k_squared dollar];
-        ad_label_s{idx1,idx2}=[dollar ad_label_s{idx1,idx2} k_squared dollar];
+        ad_label_d{idx1,idx2}=[dollar ad_label_d{idx1,idx2} star k_squared dollar];
+        ad_label_s{idx1,idx2}=[dollar ad_label_s{idx1,idx2} star k_squared dollar];
+
+        ad_label_pair{idx1,idx2}=[dollar ad_label_d{idx1,idx2} star k_squared ', ' ad_label_s{idx1,idx2} star k_squared dollar];
     end
 end
 
@@ -41,3 +44,7 @@ end
 
 ad_label_d=ad_label_d(idx,idx);
 ad_label_s=ad_label_s(idx,idx);
+ad_label_pair=ad_label_pair(idx,idx);
+
+
+
