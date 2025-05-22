@@ -31,7 +31,7 @@ for k=1:length(preferred)
     end
 end
 
-% Index of preffered fields not found in the struct
+% Index of preferred fields not found in the struct
 idx_not_found=find(isnan(new_ord));
 
 % Remove them
