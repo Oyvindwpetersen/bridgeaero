@@ -1,4 +1,4 @@
-function [model,logL_opt,neg_logL_grad,neg_logL_hess,theta_opt]=ad_gpr_opt(test_matrix,yr_t,yr_i,model,varargin)
+function [model,logL_opt,theta_opt]=ad_gpr_opt(test_matrix,yr_t,yr_i,model,varargin)
 
 %% Optimization of GPR model for ADs
 %
@@ -10,9 +10,7 @@ function [model,logL_opt,neg_logL_grad,neg_logL_hess,theta_opt]=ad_gpr_opt(test_
 %
 % Outputs:
 % model: struct with GPR model (optimized)
-% neg_logL: -log(L)
-% neg_logL_grad: gradient of -log(L) wrt. hyperparameters
-% neg_logL_hess: hessian of -log(L) wrt. hyperparameters
+% logL_opt: struct with -log(L), gradient and hessian of -log(L) wrt. hyperparameters
 % theta_opt: optimized hyperparameters
 %
 
@@ -106,14 +104,6 @@ end
 
 %%
 
-% for idx1=1:n1
-%     for idx2=1:n2
-%         y{idx1,idx2}=[yr_t{idx1,idx2} ; yr_i{idx1,idx2}];
-%     end
-% end
-
-% [neg_logL_test,neg_logL_grad_test]=ad_gpr_loglik_wrapper(test_matrix,yr_t,yr_i,model,theta0);
-
 fun_obj= @(theta) ad_gpr_loglik_wrapper(test_matrix,yr_t,yr_i,model,theta);
 
 options = optimoptions('fmincon','Display','iter','TypicalX',theta0,'ConstraintTolerance',1e-3,'OptimalityTolerance',1e-3,'StepTolerance',1e-3,...
@@ -198,7 +188,17 @@ for idx1=1:n1
     end
 end
 
-[neg_logL,neg_logL_grad,neg_logL_hess]=ad_gpr_loglik_wrapper(test_matrix,yr_t,yr_i,model,theta_opt);
+[neg_logL,neg_logL_grad,neg_logL_hess,neg_logL_grad_modelfit,neg_logL_grad_complexity]=ad_gpr_loglik_wrapper(test_matrix,yr_t,yr_i,model,theta_opt);
+
+% Assign log(L) to struct
+logL_opt=struct();
+logL_opt.info='Optimized negative log(L)';
+logL_opt.val=neg_logL;
+logL_opt.grad=neg_logL_grad;
+logL_opt.hess=neg_logL_hess;
+logL_opt.gradm=neg_logL_grad_modelfit;
+logL_opt.gradc=neg_logL_grad_complexity;
+
 
 %%
 
