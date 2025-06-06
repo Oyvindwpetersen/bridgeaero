@@ -25,16 +25,3 @@ if isempty(model.ini.L); model.ini.L=expandcol(L_char*1e0,model.p+1); end
 if isempty(model.lb.L); model.lb.L=expandcol(L_char*1e-1,model.p+1); end
 if isempty(model.ub.L); model.ub.L=expandcol(L_char*1e1,model.p+1); end
 
-
-
-% if ~isempty(model.idx.alpha)
-%     if isempty(model.ini.alpha); model.ini.alpha=expandcol(1e0,model.na); end
-%     if isempty(model.lb.alpha); model.lb.alpha=expandcol(1e-1,model.na); end
-%     if isempty(model.ub.alpha); model.ub.alpha=expandcol(1e1,model.na); end
-% end
-
-% if ~isempty(model.idx.abar)
-%     if isempty(model.ini.abar); model.ini.abar=expandcol(y_mean*1e0,model.na); end
-%     if isempty(model.lb.abar); model.lb.abar=expandcol(y_mean*1e-1,model.na); end
-%     if isempty(model.ub.abar); model.ub.abar=expandcol(y_mean*1e1,model.na); end
-% end
