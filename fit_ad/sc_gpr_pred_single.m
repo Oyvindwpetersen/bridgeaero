@@ -1,4 +1,4 @@
-function [yp,std_y_p,std_y_p_obs,ap,cov_ap]=sc_gpr_pred_single(test_matrix,pred_matrix,y,model)
+function [fp,std_y_p,std_y_p_obs,ap,cov_ap]=sc_gpr_pred_single(test_matrix,pred_matrix,y,model)
 %% Predict using GPR model
 %
 % Inputs:
@@ -17,6 +17,10 @@ function [yp,std_y_p,std_y_p_obs,ap,cov_ap]=sc_gpr_pred_single(test_matrix,pred_
 
 %%
 
+[pred_matrix_sorted,x_uni,T,T_inv]=sortmatrix(pred_matrix);
+
+%%
+
 [Ka,Ky,xt_uni,St,T_glob]=sc_gpr(test_matrix,y,model);
 
 % Difference between measurement and mean
@@ -24,7 +28,7 @@ e=y;
 
 beta=(T_glob).'/Ky*e;
 
-[T_glob_pred,xp_uni]=poly_matrix_multi(pred_matrix,model.p);
+[T_glob_pred,xp_uni]=poly_matrix_multi(pred_matrix_sorted,model.p);
 
 [Sp]=restack_a(model.p+1,length(xp_uni));
 
@@ -34,7 +38,9 @@ Ka_star_t=Sp*Ka_star_t*St.';
 
 ap=Ka_star_t*beta;
 
-yp=T_glob_pred*ap;
+fp=T_glob_pred*ap;
+
+fp=T*fp; % Transformation from sorted to mixed
 
 %% Uncertainty
 
@@ -46,10 +52,14 @@ Ka_star_star=Sp*Ka_star_star*Sp.';
 cov_ap=Ka_star_star-Ka_star_t*(T_glob).'/Ky*(T_glob)*Ka_star_t.'; cov_ap=(cov_ap+cov_ap.')/2;
 
 % Uncertainty of prediction
-cov_yp=(T_glob_pred)*cov_ap*(T_glob_pred).';
-std_y_p=diag(cov_yp).^0.5;
+cov_fp=(T_glob_pred)*cov_ap*(T_glob_pred).';
+cov_fp=T*cov_fp*T.';  % Transformation from sorted to mixed
+
+std_y_p=diag(cov_fp).^0.5;
 
 % Uncertainty of a noisy observation
 N=model.hyp.sigma_v.^2*eye(size(pred_matrix,1));
-cov_y_obs=cov_yp+N;
+N=T*N*T.';  % Transformation from sorted to mixed
+
+cov_y_obs=cov_fp+N;
 std_y_p_obs=diag(cov_y_obs).^0.5;
