@@ -44,7 +44,6 @@ theta_ub(model.idx.L,1)=model.ub.L;
 
 %%
 
-
 % Kernel is created for restacked a
 %
 % | y(alpha1,x1) | = | T(alpha1)   0       | | a(x1) |
