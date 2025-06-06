@@ -169,8 +169,8 @@ if globalsearch
     gs.FunctionTolerance=1e-3;
     gs.XTolerance=1e-3;
     gs.StartPointsToRun='bounds-ineqs';
-    gs.NumStageOnePoints=20; % 200;
-    gs.NumTrialPoints=100; % 1000;
+    gs.NumStageOnePoints=50; % 200;
+    gs.NumTrialPoints=200; % 1000;
 
     [theta_opt,logL_opt,~,~,manymins]=run(gs,problem);
 
