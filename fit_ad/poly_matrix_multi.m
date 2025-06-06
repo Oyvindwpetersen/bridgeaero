@@ -28,9 +28,10 @@ function [T_glob,x_uni]=poly_matrix_multi(data_matrix,p)
 nx=length(x_uni);
 
 % Create bins of index for each unique x
-bins=cell(1,nx);
-for k=1:length(x_uni)
-    bins{k}=find(ic==k);
+bins = accumarray(ic, (1:numel(ic))', [], @(v){v}).';
+
+if ~issorted(data_matrix(:,2))
+    warning('The data matrix second column (e.g. aoa) must be sorted st. aoa=[aoa(x1) aoa(x2) ... aoa(xN)]');
 end
 
 poly_matrix =@(alpha,p) [alpha(:)].^([0:p]);
