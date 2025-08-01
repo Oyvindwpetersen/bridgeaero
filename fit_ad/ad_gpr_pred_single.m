@@ -20,7 +20,6 @@ function [fr_p,fi_p,std_fr_p,std_fi_p,std_yr_p,std_yi_p,ap,cov_ap]=ad_gpr_pred_s
 
 %%
 
-% pred_matrix_sorted=sortmatrix(pred_matrix,)
 [pred_matrix_sorted,x_uni,T,T_inv]=sortmatrix(pred_matrix);
 
 %%
