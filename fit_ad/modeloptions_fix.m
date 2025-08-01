@@ -13,7 +13,7 @@ if ~permopt(model.kernel,{'se' 'matern52' 'rq'})
     error(['Kernel option not permissible: ' model.kernel]);
 end
 
-if ~permopt(model.noise,{'model1' 'model2' 'model3' 'model3w' 'model4' 'model4w'})
+if ~permopt(model.noise,{'model1' 'model2' 'model3' 'model3w' 'model4' 'model4w' 'model5' 'model5w'})
     error(['Noise option not permissible: ' model.noise]);
 end
 
@@ -34,6 +34,10 @@ elseif strcmpi(model.noise,'model3w')
 elseif strcmpi(model.noise,'model4')
     model.nv=2;
 elseif strcmpi(model.noise,'model4w')
+    model.nv=4;
+elseif strcmpi(model.noise,'model5')
+    model.nv=2;
+elseif strcmpi(model.noise,'model5w')
     model.nv=4;
 elseif strcmpi(model.noise,'model_a')
     model.nv=NaN;
