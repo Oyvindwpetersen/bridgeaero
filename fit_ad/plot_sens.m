@@ -85,11 +85,27 @@ for idx1=1:size(model,1)
             xl{i2(k)}=[dollar '\sigma_{v,' num2str(k) '}' dollar];
         end
         for k=1:length(i3)
-            xl{i3(k)}=[dollar '\sigma_{a,' num2str(k) '}' dollar];
+            if k==1 | k==2
+                sub_k=k;
+                a_str='a';
+            else
+                sub_k=k+1;
+                a_str='a';
+            end
+            
+            xl{i3(k)}=[dollar '\sigma_{ ' a_str ',' num2str(sub_k) '}' dollar];
         end
 
         for k=1:length(i4)
-            xl{i4(k)}=[dollar 'L_{a,' num2str(k) '}' dollar];
+            if k==1 | k==2
+                sub_k=k;
+                a_str='a';
+            else
+                sub_k=k+1;
+                a_str='a';
+            end
+            
+            xl{i4(k)}=[dollar 'L_{' a_str ',' num2str(sub_k) '}' dollar];
         end
 
         vertline_x(end+1)=i4(end);
