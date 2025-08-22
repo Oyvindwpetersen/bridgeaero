@@ -110,4 +110,4 @@ for k=1:n
 
 end
 
-axes(ha(1)); legend show;
+axes(ha(n)); legend show; % Add legend to upper right
