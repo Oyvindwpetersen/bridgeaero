@@ -169,7 +169,7 @@ if globalsearch
     gs.FunctionTolerance=1e-3;
     gs.XTolerance=1e-3;
     gs.StartPointsToRun='bounds-ineqs';
-    gs.NumStageOnePoints=50; % 200;
+    gs.NumStageOnePoints=100; % 200;
     gs.NumTrialPoints=200; % 1000;
 
     [theta_opt,logL_opt,~,~,manymins]=run(gs,problem);
@@ -199,6 +199,17 @@ logL_opt.hess=neg_logL_hess;
 logL_opt.gradm=neg_logL_grad_modelfit;
 logL_opt.gradc=neg_logL_grad_complexity;
 
+n_par=length(model{1,1}.idx.glob);
+
+N_points=0;
+for idx1=1:n1
+    for idx2=1:n2
+        N_points=N_points+size(test_matrix{idx1,idx2},1);
+    end
+end
+
+logL_opt.AIC=-2*log(-neg_logL)+2*n_par;
+logL_opt.BIC=-2*log(-neg_logL)+n_par*log(N_points);
 
 %%
 
