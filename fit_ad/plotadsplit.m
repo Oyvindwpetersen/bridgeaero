@@ -1,11 +1,11 @@
-function ha=plotadsplit(test_matrix,yr_t,yr_i,model,K_pred,varargin)
+function ha=plotadsplit(test_matrix,yr_t,yi_t,model,K_pred,varargin)
 
 %% Plot separate
 %
 % Inputs:
 % test_matrix: [M,2] matrix with K and x as columns
 % yr_t: [M,1] vector with K^2*AD_stiffness
-% yr_i: [M,1] vector with K^2*AD_damping
+% yi_t: [M,1] vector with K^2*AD_damping
 % model: struct with GPR model
 % K_pred: vector with frequencies to predict
 %
@@ -71,7 +71,7 @@ for k=1:n
 
     pred_matrix=gridvec(K_pred,xt_uni(k));
 
-    [yr_pred,yi_pred,std_yr_pred,std_yi_pred,std_yr_obs,std_yi_obs,a_pred,cov_a_pred]=ad_gpr_pred(test_matrix,pred_matrix,yr_t,yr_i,model);
+    [yr_pred,yi_pred,std_yr_pred,std_yi_pred,std_yr_obs,std_yi_obs,a_pred,cov_a_pred]=ad_gpr_pred(test_matrix,pred_matrix,yr_t,yi_t,model);
 
     % Stiffness AD
     axes(ha(k)); hold on; grid on; 
@@ -97,7 +97,7 @@ for k=1:n
     % Damping AD
     axes(ha(k+n)); hold on; grid on;
     plot(K_pred,yi_pred,plotopt_pred);
-    plot(test_matrix(idx_h,1),yr_i(idx_h),plotopt_train);
+    plot(test_matrix(idx_h,1),yi_t(idx_h),plotopt_train);
 
     if uncertainty
         h_shade=plotci(K_pred,yi_pred,std_yi_pred,n_sd,'Color',[0 0 1]);
