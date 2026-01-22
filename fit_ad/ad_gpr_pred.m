@@ -1,4 +1,4 @@
-function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gpr_pred(test_matrix,pred_matrix,yr_t,yi_t,model)
+function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gpr_pred(test_matrix,pred_matrix,yr_t,yi_t,model,varargin)
 %% Predict using GPR model
 %
 % Inputs:
@@ -17,6 +17,15 @@ function [yr_p,yi_p,std_yr_p,std_yi_p,std_yr_p_obs,std_yi_p_obs,ap,cov_ap]=ad_gp
 % std_yi_p_obs: [N,1] vector with SD of yr_p (+noise)
 % ap: predicted a coefficients
 %
+
+%% Parse inputs
+
+p=inputParser;
+addParameter(p,'random',false,@islogical)
+% addParameter(p,'Marker','d')
+
+parse(p,varargin{:});
+random=p.Results.random;
 
 %%
 
@@ -45,7 +54,7 @@ for idx1=1:n1
     for idx2=1:n2
 
         [yr_p_loc,yi_p_loc,std_yr_p_loc,std_yi_p_loc,std_yr_p_obs_loc,std_yi_p_obs_loc,ap_loc,cov_ap_loc]=...
-            ad_gpr_pred_single(test_matrix{idx1,idx2},pred_matrix{idx1,idx2},yr_t{idx1,idx2},yi_t{idx1,idx2},model{idx1,idx2});
+            ad_gpr_pred_single(test_matrix{idx1,idx2},pred_matrix{idx1,idx2},yr_t{idx1,idx2},yi_t{idx1,idx2},model{idx1,idx2},varargin{:});
 
         yr_p{idx1,idx2}=yr_p_loc;
         yi_p{idx1,idx2}=yi_p_loc;
