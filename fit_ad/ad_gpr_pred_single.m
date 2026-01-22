@@ -1,4 +1,4 @@
-function [fr_p,fi_p,std_fr_p,std_fi_p,std_yr_p,std_yi_p,ap,cov_ap]=ad_gpr_pred_single(test_matrix,pred_matrix,yr,yi,model)
+function [fr_p,fi_p,std_fr_p,std_fi_p,std_yr_p,std_yi_p,ap,cov_ap]=ad_gpr_pred_single(test_matrix,pred_matrix,yr,yi,model,varargin)
 %% Predict using GPR model
 %
 % Inputs:
@@ -17,6 +17,16 @@ function [fr_p,fi_p,std_fr_p,std_fi_p,std_yr_p,std_yi_p,ap,cov_ap]=ad_gpr_pred_s
 % std_yi_p_obs: [N,1] vector with SD of yr_p (+noise)
 % ap: predicted a coefficients
 %
+
+
+%% Parse inputs
+
+p=inputParser;
+addParameter(p,'random',false,@islogical)
+% addParameter(p,'Marker','d')
+
+parse(p,varargin{:});
+random=p.Results.random;
 
 %%
 
@@ -52,13 +62,6 @@ else
     ap=Ka_star_t*beta;
 end
 
-fp=D_glob_pred*ap;
-fp=blkdiag2(T,T,'s')*fp; % Transformation from sorted to mixed
-
-fr_p=fp(1:length(fp)/2);
-
-fi_p=fp((length(fp)/2+1):end);
-
 %% Uncertainty
 
 Ka_star_star_blk=kernel_cov(xp_uni,xp_uni,model.kernel,model.hyp);
@@ -85,3 +88,17 @@ cov_y=cov_fp+N;
 
 std_yr_p=diag(cov_y(1:n/2,1:n/2)).^0.5;
 std_yi_p=diag(cov_y(n/2+1:end,n/2+1:end)).^0.5;
+
+%% Output predictions
+
+if random
+    ap_rand=mvnrnd(ap,cov_ap,1).';
+    ap=ap_rand;
+end
+
+fp=D_glob_pred*ap;
+fp=blkdiag2(T,T,'s')*fp; % Transformation from sorted to mixed
+
+fr_p=fp(1:length(fp)/2);
+
+fi_p=fp((length(fp)/2+1):end);
